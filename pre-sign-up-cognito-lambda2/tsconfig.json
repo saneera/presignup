@@ -1,0 +1,10 @@
+{
+   "compilerOptions": {
+    "sourceMap": true,
+    "strict": true,
+    "lib": [
+      "es6",
+      "es2015.promise"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "pre-sign-up-cognito-lambda",
+  "version": "1.0.0",
+  "description": "Pre Sign up < - > Lambda",
+  "main": "handler.ts",
+  "scripts": {
+    "test": "ts-mocha advam_modules/**/*.spec.ts"
+  },
+  "devDependencies": {
+    "@types/expect": "^1.20.3",
+    "@types/mocha": "^5.2.0",
+    "@types/node": "^8.0.57",
+    "@types/should": "^13.0.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^5.1.1",
+    "serverless-webpack": "^4.0.0",
+    "ts-loader": "^2.3.7",
+    "ts-mocha": "^1.2.0",
+    "typescript": "^2.5.2",
+    "webpack": "^3.6.0"
+  },
+  "author": "ADVAM",
+  "license": "ADVAM",
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.3",
+    "@types/json-stable-stringify": "^1.0.31",
+    "agentkeepalive": "^3.4.1",
+    "aws-sdk": "^2.224.1",
+    "request": "^2.85.0",
+    "xml2js": "^0.4.19"
+  }
+}

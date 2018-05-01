@@ -1,0 +1,15 @@
+service: pre-sign-up-cognito-lambda
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+ 
+functions:
+  cognitoPreSignUp:
+    name: test-cognitoPreSignUp
+    handler: handler.preSignUpHandler
+    memorySize: 512
+    timeout: 30

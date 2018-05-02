@@ -1,9 +1,12 @@
-import { Callback, Context } from 'aws-lambda';
+import { Context } from 'aws-lambda';
 import { SignUpUserEvent } from './signup-userevent';
 import { ApiError} from './api-error';
 import { CognitoIdentityServiceProvider} from 'aws-sdk';
 import * as stringify from 'json-stable-stringify';
 
+export type Callback = (err?: Error | string, data?: any) => void;
+type UserAttribute = CognitoIdentityServiceProvider.Types.AttributeType;  
+const getUserAttribute = (attributes: UserAttribute[], attributeName: string) => attributes ? attributes.filter(attribute => attribute.Name === attributeName)[0].Value : undefined;
 
 export const cognito = new CognitoIdentityServiceProvider();
 type existingUser = CognitoIdentityServiceProvider.UserType;
@@ -18,20 +21,18 @@ export const preSignUp = (newUser: SignUpUserEvent, context: any, callback: Call
       .then(existingUser => {
         if (existingUser.Enabled && existingUser.UserStatus === 'CONFIRMED' && existingUser.Attributes && existingUser.Username
         && getUserAttribute(existingUser.Attributes, 'email_verified') === 'true'){
-          return linkUsers2(newUser.userName, existingUser.Username, newUser.userPoolId);
+          return linkUsers(newUser.userName, existingUser.Username, newUser.userPoolId);
         } else{
           console.error(stringify(existingUser));
           throw new ApiError(`invalid state for ${existingUser.Username}`);
         }        
       });
-    } else {
-      callback(null, newUser);
-    }
+    } 
   })
   .then(() => callback(null, newUser))
   .catch(() =>{
     console.error(stringify([newUser]));
-    throw new ApiError(`invalid state for`);
+     callback('User signup is disabled');
   });  
   
 };
@@ -54,7 +55,9 @@ const getUserByAttribute = (attributeName: string, attributeValue: string, userP
       });
 };
 
-const linkUsers2 = (externalUsername: string, internalUsername: string, userPoolId: string) => {
+
+
+ const linkUsers = (externalUsername: string, internalUsername: string, userPoolId: string, )=>{
   return cognito.adminLinkProviderForUser({
    UserPoolId: userPoolId,
    SourceUser: {
@@ -66,39 +69,7 @@ const linkUsers2 = (externalUsername: string, internalUsername: string, userPool
      ProviderName: 'Cognito',
      ProviderAttributeValue: internalUsername,
    },
- }).promise();
-};
-
-
- const linkUsers = (externalUsername: string, internalUsername: string, userPoolId: string, callback: (result: any) => any) => {
-    const params = {     
-      SourceUser: {
-        ProviderName: externalUsername.split('_')[0],
-        ProviderAttributeName: 'Cognito_Subject',
-        ProviderAttributeValue: externalUsername.split('_')[1],
-      },
-      DestinationUser: {
-        ProviderName: 'Cognito',
-        ProviderAttributeValue: internalUsername,
-      },
-      UserPoolId: userPoolId
-    }
-
-    cognito.adminLinkProviderForUser(params, function(err, data) {
-      if (err)  {
-        console.log(err, err.stack); 
-        // return err;
-        callback(err);
-      } else {
-        console.log(data);   
-        callback(data);     
-      }
-    });
+  }).promise();
   };
  
   
-  type UserAttribute = CognitoIdentityServiceProvider.Types.AttributeType;
-
-  
-  
-  const getUserAttribute = (attributes: UserAttribute[], attributeName: string) => attributes ? attributes.filter(attribute => attribute.Name === attributeName)[0].Value : undefined;
